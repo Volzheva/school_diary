@@ -10,7 +10,7 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'email', 'role']
+        fields = ['username', 'first_name', 'email', 'role', 'student_class']
 
     def clean_password2(self):
         cd = self.cleaned_data
@@ -24,3 +24,11 @@ class UserRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+
