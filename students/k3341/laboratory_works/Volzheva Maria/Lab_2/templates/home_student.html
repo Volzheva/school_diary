@@ -1,0 +1,37 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h4>Добро пожаловать, дорогой ученик!</h4>
+    <h6>Класс:</h6> {{ our_user.student_class}}
+    <h6>Предметы:</h6>
+    <h6>Все дз:</h6>
+    <table>
+            {% for homework in all_homeworks %}
+            <tr>
+                <td>{{ homework.subject }}</td>
+                <td>{{ homework.description }}</td>
+                <td>{{ homework.date_to }}</td>
+                <td><a href="/homework/{{ homework.id }}/">Подробнее</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Нет домашних заданий.</td>
+            </tr>
+            {% endfor %}
+    </table>
+    <h6>Сданные дз:</h6>
+    <table>
+            {% for submission in all_submissions %}
+            <tr>
+                <td>{{ submission.homework }}</td>
+                <td>{{ submission.submitted_at }}</td>
+                <td>{{ submission.grade }}</td>
+                <td><a href="/submission/{{ submission.id }}/">Подробнее</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Нет сделанных домашних заданий.</td>
+            </tr>
+            {% endfor %}
+    </table>
+{% endblock %}

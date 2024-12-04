@@ -27,8 +27,19 @@ class UserRegistrationForm(forms.ModelForm):
 
 
 class CustomAuthenticationForm(AuthenticationForm):
-    class Meta:
-        model = User
-        fields = ['username', 'password']
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя пользователя'})
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль'})
+    )
 
+
+class CreateSubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Submission
+        fields = [
+            "submitted_text",
+        ]
 

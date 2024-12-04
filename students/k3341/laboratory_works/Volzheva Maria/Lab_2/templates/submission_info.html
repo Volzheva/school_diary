@@ -1,0 +1,10 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h4>Подробнее о сделанном дз</h4>
+    <h6>Дз:</h6> {{ submission_info.homework}}
+    <h6>Отправленное дз:</h6> {{ submission_info.submitted_text}}
+    <h6>Отправлено в:</h6> {{ submission_info.submitted_at}}
+    <h6>Оценка:</h6> {{ submission_info.grade}}
+     <a href="/home">Назад</a>
+{% endblock %}

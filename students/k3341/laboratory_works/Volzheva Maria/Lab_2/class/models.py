@@ -57,3 +57,4 @@ class Submission(models.Model):
         permissions = [
             ('can_grade_submissions', 'Can grade submissions'),
         ]
+

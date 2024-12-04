@@ -1,0 +1,12 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h4>Подробнее о дз</h4>
+    <h6>Предмет:</h6> {{ object.subject}}
+    <h6>Описание:</h6> {{ object.description}}
+    <h6>Дедлайн:</h6> {{ object.date_to}}
+    <h6>Штрафы:</h6> {{ object.penalties_info}}
+    <form action="/homework/{{ object.id }}/new_submission/" target="_blank">
+        <button>Сдать дз</button>
+    </form>
+{% endblock %}
