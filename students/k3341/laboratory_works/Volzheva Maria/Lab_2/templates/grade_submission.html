@@ -1,0 +1,15 @@
+{% extends "home.html" %}
+
+{% block content %}
+        <h1>Оценка работы студента: {{ submission.student.username }}</h1>
+    <p>Текст задания: {{ submission.homework.description }}</p>
+    <p>Текст сдачи: {{ submission.submitted_text }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="grade">Оценка:</label>
+        <input type="number" name="grade" required>
+        <button type="submit">Сохранить оценку</button>
+    </form>
+    <a href="/submissions/without-grades/">Назад</a>
+{% endblock %}

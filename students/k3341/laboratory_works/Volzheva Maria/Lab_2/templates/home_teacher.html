@@ -1,5 +1,22 @@
 {% extends "home.html" %}
 
 {% block content %}
-    <h3>Добро пожаловать, дорогой учитель!</h3>
+    <h4>Добро пожаловать, дорогой учитель!</h4>
+    <h6>Мои предметы:</h6>
+    <table>
+            {% for subject in subjects %}
+            <tr>
+                <td>{{ subject.name }}</td>
+                <td>{{ subject.description }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Нет текущих предметов.</td>
+            </tr>
+            {% endfor %}
+    </table>
+    <h6>Оценки классов:</h6>
+    <a href="/grades_for_teacher/">Подробнее</a>
+    <h6>Непроверенные ДЗ:</h6>
+    <a href="/submissions/without-grades/">Подробнее</a>
 {% endblock %}

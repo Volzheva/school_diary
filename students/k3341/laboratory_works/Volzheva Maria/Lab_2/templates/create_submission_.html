@@ -1,0 +1,14 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>Отправка дз:</h1>
+    <p>Текст задания: {{ homework.description }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="grade">Моё дз::</label>
+        <input type="submitted_text" name="submitted_text" required>
+        <button type="submit">Отправить моё дз</button>
+    </form>
+    <a href="/submissions/without-grades/">Назад</a>
+{% endblock %}

@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.http import Http404
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -9,13 +8,13 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 import datetime
-from .models import User, Subject, Homework, Submission
+from .models import User, Subject, Homework, Submission, Class
 from .forms import UserRegistrationForm, CustomAuthenticationForm, CreateSubmissionForm
 from django.urls import reverse_lazy
 from Lab_2 import settings
 from django.contrib.auth.decorators import login_required
 import re
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 
 
 def get_welcome(request):
@@ -37,7 +36,6 @@ class CustomLoginView(LoginView):
 
 @login_required
 def get_home(request):
-    print("IMPORTANT ", request)
     try:
         our_user = request.user
         if our_user.role == 'student':
@@ -45,7 +43,9 @@ def get_home(request):
             all_submissions = Submission.objects.all().filter(student=our_user)
             context = {'our_user': our_user, 'all_homeworks': all_homeworks, 'all_submissions': all_submissions}
             return render(request, 'home_student.html', context)
-        context = {"our_user": our_user}
+
+        subjects = Subject.objects.all().filter(teachers=our_user)
+        context = {'our_user': our_user, 'subjects': subjects}
         return render(request, 'home_teacher.html', context)
     except Exception as e:
         # Логгирование или обработка ошибки
@@ -67,18 +67,6 @@ class HomeworkRetrieveView(DetailView):
     model = Homework
 
 
-def create_submission(request, pk):
-    homework = Homework.objects.get(pk=pk)
-    form = CreateSubmissionForm(request.POST or None)
-    if form.is_valid():
-        instance = form.save(commit=False)
-        instance.homework = homework
-        instance.student = request.user
-        instance.submitted_at = datetime.datetime.now()
-        instance.save()
-    return render(request, "create_submission.html", {'form': CreateSubmissionForm(), 'our_user': request.user})
-
-
 @login_required
 def get_submission(request, pk):
     try:
@@ -88,6 +76,127 @@ def get_submission(request, pk):
         return render(request, 'submission_info.html', context)
     except Exception as e:
         raise Http404("Страница не найдена")
+
+
+def grades_by_subject_per_class(request):
+    try:
+        our_user = request.user
+        if our_user.role == 'teacher':
+            # Извлекаем все классы
+
+            classes = Class.objects.prefetch_related('students')
+
+            # Создание структуры данных для передачи в шаблон
+            data = {}
+            for class_instance in classes:
+                data[class_instance.name] = {}
+
+                # Получаем все домашние задания для всех предметов
+                homeworks = Homework.objects.prefetch_related('submission_set', 'subject').filter(
+                    classes=class_instance)
+
+                for homework in homeworks:
+                    subject_name = homework.subject.name
+
+                    # Если ещё нет такого предмета в данных для данного класса, добавляем его
+                    if subject_name not in data[class_instance.name]:
+                        data[class_instance.name][subject_name] = []
+
+                    # Добавляем информацию о сдачах к домашнему заданию
+                    submissions = homework.submission_set.all()
+                    for submission in submissions:
+                        data[class_instance.name][subject_name].append({
+                            'student': submission.student.username,
+                            'description': submission.homework.description,
+                            'submitted_at': submission.submitted_at,
+                            'grade': submission.grade,
+                        })
+
+            return render(request, 'grades_per_class.html', {'data': data, 'our_user': request.user})
+        return render(request, 'not_available.html', {'our_user': our_user})
+    except Exception as e:
+        # Логгирование или обработка ошибки
+        raise Http404("Страница не найдена")  # Измените на нужный вам ответ
+
+
+def submissions_without_grades(request):
+    try:
+        our_user = request.user
+        if our_user.role == 'teacher':
+            # Извлекаем все submission без оценок (grade = null)
+            submissions = Submission.objects.filter(grade__isnull=True).select_related('homework__subject')
+
+            # Создание структуры данных для передачи в шаблон
+            data = {}
+            for submission in submissions:
+                subject_name = submission.homework.subject.name
+
+                # Если ещё нет такого предмета в данных, добавляем его
+                if subject_name not in data:
+                    data[subject_name] = []
+
+                data[subject_name].append(submission)
+
+            return render(request, 'submissions_without_grades.html', {'data': data, 'our_user': request.user})
+        return render(request, 'not_available.html', {'our_user': our_user})
+    except Exception as e:
+        # Логгирование или обработка ошибки
+        raise Http404("Страница не найдена")  # Измените на нужный вам ответ
+
+
+# def create_submission(request, pk):
+#     homework = Homework.objects.get(pk=pk)
+#     form = CreateSubmissionForm(request.POST or None)
+#     if form.is_valid():
+#         instance = form.save(commit=False)
+#         instance.homework = homework
+#         instance.student = request.user
+#         instance.submitted_at = datetime.datetime.now()
+#         instance.save()
+#     return render(request, "create_submission.html", {'form': CreateSubmissionForm(), 'our_user': request.user})
+
+
+def create_submission_(request, pk):
+    try:
+        our_user = request.user
+        if our_user.role == 'student':
+            homework = Homework.objects.get(pk=pk)
+            if request.method == 'POST':
+                # Получаем оценку из формы (предполагается, что форма отправляется методом POST)
+                submitted_text = request.POST.get('submitted_text')
+                if submitted_text is not None:
+                    Submission.objects.create(homework=homework, student=request.user, submitted_text=submitted_text,
+                                              submitted_at=datetime.datetime.now())
+                    return redirect('home')
+
+            return render(request, 'create_submission_.html', {'homework': homework, 'our_user': request.user})
+        return render(request, 'not_available.html', {'our_user': our_user})
+    except Exception as e:
+        # Логгирование или обработка ошибки
+        raise Http404("Страница не найдена")  # Измените на нужный вам ответ
+
+
+def grade_submission(request, pk):
+    try:
+        our_user = request.user
+        if our_user.role == 'teacher':
+            submission = get_object_or_404(Submission, id=pk)
+
+            if request.method == 'POST':
+                # Получаем оценку из формы (предполагается, что форма отправляется методом POST)
+                grade = request.POST.get('grade')
+                if grade is not None:
+                    # Присваиваем оценку submission и сохраняем его
+                    submission.grade = grade
+                    submission.save()
+                    # Перенаправляем на страницу с безоценочными submissions
+                    return redirect('submissions_without_grades')
+
+            return render(request, 'grade_submission.html', {'submission': submission})
+        return render(request, 'not_available.html', {'our_user': our_user})
+    except Exception as e:
+        # Логгирование или обработка ошибки
+        raise Http404("Страница не найдена")  # Измените на нужный вам ответ
 
 
 # class SubmissionCreateView(CreateView):

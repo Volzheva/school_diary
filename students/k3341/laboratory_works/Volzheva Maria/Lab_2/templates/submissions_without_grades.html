@@ -1,0 +1,31 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>Не оценённые работы</h1>
+    {% for subject, submissions in data.items %}
+        <h2>Предмет: {{ subject }}</h2>
+        <table border="1">
+            <tr>
+                <th>Студент</th>
+                <th>Текст дз</th>
+                <th>Текст сдачи</th>
+                <th>Дата сдачи</th>
+                <th>Действия</th>
+            </tr>
+            {% for submission in submissions %}
+                <tr>
+                    <td>{{ submission.student.username }}</td>
+                    <td>{{ submission.homework.description }}</td>
+                    <td>{{ submission.submitted_text }}</td>
+                    <td>{{ submission.submitted_at }}</td>
+                    <td>
+                        <a href="/submissions/grade/{{ submission.id }}">Оценить</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% empty %}
+        <p>Нет не оценённых работ.</p>
+    {% endfor %}
+    <a href="/home/">Назад</a>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "home.html" %}
+
+{% block content %}
+    <h1>Оценки по классам и предметам</h1>
+    {% for class_name, subjects in data.items %}
+        <h2>Класс: {{ class_name }}</h2>
+        {% for subject, submissions in subjects.items %}
+            <h3>Предмет: {{ subject }}</h3>
+            <table border="1">
+                <tr>
+                    <th>Студент</th>
+                    <th>ДЗ</th>
+                    <th>Дата сдачи</th>
+                    <th>Оценка</th>
+                </tr>
+                {% for submission in submissions %}
+                    <tr>
+                        <td>{{ submission.student }}</td>
+                        <td>{{ submission.description }}</td>
+                        <td>{{ submission.submitted_at }}</td>
+                        <td>{{ submission.grade }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% empty %}
+            <p>Нет оценок для данного предмета.</p>
+        {% endfor %}
+    {% empty %}
+        <p>Нет классов.</p>
+    {% endfor %}
+    <a href="/home/">Назад</a>
+{% endblock %}
