@@ -7,14 +7,15 @@ from django.views.generic.edit import UpdateView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 import datetime
-from .models import CarOwner, Car
+from .models import User, Car
 from .forms import CarOwnerForm
+from djangoProject import settings
 
 
 def get_сar_owner_details(request, car_owner_id):
     try:
-        сar_owner = CarOwner.objects.get(pk=car_owner_id)
-    except CarOwner.DoesNotExist:
+        сar_owner = settings.AUTH_USER_MODEL.objects.get(pk=car_owner_id)
+    except settings.AUTH_USER_MODEL.DoesNotExist:
         raise Http404("Owner does not exist")
     return render(request, 'сar_owner.html', {'сar_owner': сar_owner})
 
@@ -40,12 +41,12 @@ def example_view(request):
 
 
 def get_owners(request):
-    context = {"owners": CarOwner.objects.all()}
+    context = {"owners": settings.AUTH_USER_MODEL.objects.all()}
     return render(request, "owners.html", context)
 
 
 def get_сar_owners(request):
-    сar_owners = {"owners": CarOwner.objects.all()}
+    сar_owners = {"owners": settings.AUTH_USER_MODEL.objects.all()}
     return render(request, "car_owners.html", сar_owners)
 
 
