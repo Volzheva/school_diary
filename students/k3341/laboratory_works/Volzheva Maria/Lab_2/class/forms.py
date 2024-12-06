@@ -12,6 +12,13 @@ class UserRegistrationForm(forms.ModelForm):
         model = User
         fields = ['username', 'first_name', 'email', 'role', 'student_class']
 
+    student_class = forms.ModelChoiceField(
+        queryset=Class.objects.all(),
+        required=False,
+        label='Класс',
+        empty_label='Выберите класс'
+    )
+
     def clean_password2(self):
         cd = self.cleaned_data
         if cd['password'] != cd['password2']:

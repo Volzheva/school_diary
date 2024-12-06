@@ -25,7 +25,14 @@ class RegistrationView(CreateView):
     model = User
     form_class = UserRegistrationForm
     template_name = 'registration.html'
-    success_url = '/login/'
+    success_url = '/login/'  # Используйте reverse_lazy для избежания проблем с URL
+
+    def get_context_data(self, **kwargs):
+        # Вызываем родительский метод, чтобы получить контекст
+        context = super().get_context_data(**kwargs)
+        # Добавляем классы из базы данных в контекст
+        context['classes'] = Class.objects.all()
+        return context
 
 
 class CustomLoginView(LoginView):
