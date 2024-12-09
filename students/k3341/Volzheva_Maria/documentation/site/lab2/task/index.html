@@ -569,6 +569,30 @@
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
+      Рассмотрим один пункт из функционала более подробно:
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Рассмотрим один пункт из функционала более подробно:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Функционал для страница для сдачи дз:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
       Запуск программы:
     </span>
   </a>
@@ -740,6 +764,30 @@
         <li class="md-nav__item">
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
+      Рассмотрим один пункт из функционала более подробно:
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Рассмотрим один пункт из функционала более подробно:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Функционал для страница для сдачи дз:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
       Запуск программы:
     </span>
   </a>
@@ -843,7 +891,60 @@
 <li>'http://127.0.0.1:8000/submissions/grade/<int:pk>/' - страница для оценки (проверки) домашнего задания</li>
 <li>'http://127.0.0.1:8000/grades_for_teacher/' - страница для просмотра оценок учеников по классам</li>
 </ul>
-<h2 id="_6">Запуск программы:</h2>
+<h2 id="_6">Рассмотрим один пункт из функционала более подробно:</h2>
+<h4 id="_7">Функционал для страница для сдачи дз:</h4>
+<p>views.py:</p>
+<pre><code class="language-python">def create_submission_(request, pk):
+    try:
+        our_user = request.user
+        if our_user.role == 'student':
+            homework = Homework.objects.get(pk=pk)
+            if request.method == 'POST':
+                # Получаем оценку из формы (предполагается, что форма отправляется методом POST)
+                submitted_text = request.POST.get('submitted_text')
+                if submitted_text is not None:
+                    Submission.objects.create(homework=homework, student=request.user, submitted_text=submitted_text,
+                                              submitted_at=datetime.datetime.now())
+                    return redirect('home')
+
+            return render(request, 'create_submission_.html', {'homework': homework, 'our_user': request.user})
+        return render(request, 'not_available.html', {'our_user': our_user})
+    except Exception as e:
+        # Логгирование или обработка ошибки
+        raise Http404(&quot;Страница не найдена&quot;)  # Измените на нужный вам ответ
+</code></pre>
+<p>create_submission_.html</p>
+<pre><code class="language-html">{% extends &quot;home.html&quot; %}
+
+{% block content %}
+    &lt;div class=&quot;container my-4 p-4 bg-light rounded&quot;&gt;
+        &lt;h1 class=&quot;text-primary&quot;&gt;Отправка дз:&lt;/h1&gt;
+        &lt;p class=&quot;text-dark&quot;&gt;&lt;strong&gt;Текст задания:
+        &lt;/strong&gt;{{ homework.description }}&lt;/p&gt;
+
+        &lt;form method=&quot;post&quot; class=&quot;mb-3&quot;&gt;
+            {% csrf_token %}
+            &lt;div class=&quot;form-group&quot;&gt;
+                &lt;label for=&quot;submitted_text&quot; class=&quot;font-weight-bold&quot;&gt;Моё дз:&lt;/label&gt;
+                &lt;input type=&quot;text&quot; id=&quot;submitted_text&quot; name=&quot;submitted_text&quot; class=&quot;form-control&quot; required&gt;
+            &lt;/div&gt;
+            &lt;button type=&quot;submit&quot; class=&quot;btn btn-primary&quot;&gt;Отправить моё дз&lt;/button&gt;
+        &lt;/form&gt;
+
+        &lt;a href=&quot;/submissions/without-grades/&quot; class=&quot;btn btn-link&quot;&gt;Назад&lt;/a&gt;
+    &lt;/div&gt;
+{% endblock %}
+</code></pre>
+<p>urls.py</p>
+<pre><code>urlpatterns = [
+    ...
+    path('homework/&lt;int:pk&gt;/new_submission/', views.create_submission_),
+    ...
+]
+</code></pre>
+<p>Скрин с сайта:</p>
+<p><img alt="" src="example.png" /></p>
+<h2 id="_8">Запуск программы:</h2>
 <pre><code>python manage.py runserver
 </code></pre>
 
