@@ -32,6 +32,10 @@
         </table>
 
         <h6>Сданные дз:</h6>
+        <form method="get" action="{% url 'home' %}" class="mb-3">
+            <input type="number" name="grade" placeholder="Поиск по оценке" value="{{ request.GET.grade }}" style="padding: 10px; flex: 1;">
+            <button type="submit" class="btn btn-info">Поиск</button>
+        </form>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -42,7 +46,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for submission in all_submissions %}
+                {% for submission in page_obj %}
                     <tr>
                         <td>{{ submission.homework }}</td>
                         <td>{{ submission.submitted_at }}</td>
@@ -56,5 +60,24 @@
                 {% endfor %}
             </tbody>
         </table>
+
+    <!-- Блок пагинации -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.grade %}grade={{ request.GET.grade }}&{% endif %}page=1">Первая</a>
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.grade %}grade={{ request.GET.grade }}&{% endif %}page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.grade %}grade={{ request.GET.grade }}&{% endif %}page={{ page_obj.next_page_number }}">Следующая</a>
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.grade %}grade={{ request.GET.grade }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Последняя</a>
+            {% endif %}
+        </span>
+    </div>
     </div>
 {% endblock %}

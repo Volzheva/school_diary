@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
+from django.core.paginator import Paginator
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.generic.list import ListView
@@ -47,8 +48,21 @@ def get_home(request):
         our_user = request.user
         if our_user.role == 'student':
             all_homeworks = Homework.objects.all().filter(classes=our_user.student_class)
-            all_submissions = Submission.objects.all().filter(student=our_user)
-            context = {'our_user': our_user, 'all_homeworks': all_homeworks, 'all_submissions': all_submissions}
+            submissions = Submission.objects.all().filter(student=our_user)
+            # Дополнительный поиск по запросу
+            grade_query = request.GET.get('grade', '')
+
+            if grade_query:
+                try:
+                    grade = int(grade_query)
+                    submissions = submissions.filter(grade=grade)
+                except ValueError:
+                    pass
+            paginator = Paginator(submissions, 2)
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+
+            context = {'our_user': our_user, 'all_homeworks': all_homeworks, 'page_obj': page_obj}
             return render(request, 'home_student.html', context)
 
         subjects = Subject.objects.all().filter(teachers=our_user)
@@ -149,6 +163,9 @@ def submissions_without_grades(request):
     except Exception as e:
         # Логгирование или обработка ошибки
         raise Http404("Страница не найдена")  # Измените на нужный вам ответ
+
+
+
 
 
 # def create_submission(request, pk):
