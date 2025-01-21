@@ -19,7 +19,6 @@ from insurance_app.serializers import InsuredEmployeeSerializer, OrganizationSer
 
 
 class IndividualClientAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
     serializer_class = IndividualClientSerializer
 
     def get(self, request):
@@ -36,13 +35,13 @@ class IndividualClientAPIView(GenericAPIView):
 
 
 class IndividualClientDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     serializer_class = IndividualClientSerializer
     queryset = IndividualClient.objects.all()
 
 
 class AgentAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     serializer_class = AgentSerializer
 
     def get(self, request):
@@ -59,7 +58,7 @@ class AgentAPIView(GenericAPIView):
 
 
 class AgentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     serializer_class = AgentSerializer
     queryset = Agent.objects.all()
 
@@ -110,7 +109,7 @@ class LaborContractDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class OrganizationAPIView(GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     serializer_class = OrganizationSerializer
 
     def get(self, request):
@@ -127,7 +126,7 @@ class OrganizationAPIView(GenericAPIView):
 
 
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
     serializer_class = OrganizationSerializer
     queryset = Organization.objects.all()
 
@@ -459,7 +458,7 @@ class OrganizationPaymentsView(GenericAPIView):
 
 class ContractsSummaryView(GenericAPIView):
     serializer_class = IndividualContractSerializer
-    permission_classes = [IsAuthenticated]
+    #permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="Отчёт",
