@@ -1,20 +1,20 @@
 <script setup>
 import {onMounted, ref} from "vue";
 import axios from "axios";
-import AgentList from "@/components/agent/AgentList.vue";
-import AgentModal from "@/components/agent/AgentModal.vue";
-const agents = ref([]);
+import ClientList from "@/components/client/ClientList.vue";
+import ClientModal from "@/components/client/ClientModal.vue";
+const clients = ref([]);
 const isLoading = ref(false);
 const isError = ref(false);
 const isAddModalVisible = ref(false);
 let token; // Объявляем переменную на уровне, доступном для обеих функций
 
-async function fetchAgents() {
+async function fetchClients() {
   isLoading.value = true;
   await axios
-      .get('http://127.0.0.1:8000/insurance/agents/')
+      .get('http://127.0.0.1:8000/insurance/clients/')
       .then(response => {
-        agents.value = response.data;
+        clients.value = response.data;
         console.log(response.data);
       })
       .catch(error => {
@@ -27,33 +27,33 @@ async function fetchAgents() {
 }
 
 
-async function addAgent(agent) {
-  await axios.post(`insurance/agents/`, agent).then(fetchAgents).catch(error => {
+async function addClient(client) {
+  await axios.post(`insurance/clients/`, client).then(fetchClients).catch(error => {
     isError.value = true;
-    console.error(`Ошибка добавления агента: ${error}`);
+    console.error(`Ошибка добавления клиента: ${error}`);
   })
 }
-async function deleteAgent(id) {
-  await axios.delete(`http://127.0.0.1:8000/insurance/agents/${id}`).then(() => {
-    agents.value = agents.value.filter(item => item.id !== id);
+async function deleteClient(id) {
+  await axios.delete(`http://127.0.0.1:8000/insurance/clients/${id}`).then(() => {
+    clients.value = clients.value.filter(item => item.id !== id);
   }).catch(error => {
     isError.value = true;
-    console.error(`Ошибка удаления агента: ${error}`);
+    console.error(`Ошибка удаления клиента: ${error}`);
   })
 }
-async function updateAgent(agent) {
+async function updateClient(client) {
   try {
-    await axios.put(`http://127.0.0.1:8000/insurance/agents/${agent.id}`, agent);
-    await fetchAgents();
+    await axios.put(`http://127.0.0.1:8000/insurance/clients/${client.id}`, client);
+    await fetchClients();
   } catch (error) {
     isError.value = true;
-    console.error('Ошибка обновления агента: ${error}');
+    console.error('Ошибка обновления клиента: ${error}');
   }
 }
 
 
 
-onMounted(fetchAgents);
+onMounted(fetchClients);
 </script>
 
 <template>
@@ -62,10 +62,10 @@ onMounted(fetchAgents);
       <v-skeleton-loader type="card" class="mt-4" max-width="500"></v-skeleton-loader>
     </template>
     <template v-else>
-      <h2>Список агентов</h2>
-      <v-btn color="#4CAF50" @click="isAddModalVisible = true">Добавить агента</v-btn>
-      <AgentList :agents="agents" @delete-agent="deleteAgent" @update-agent="updateAgent"/>
-      <AgentModal v-model="isAddModalVisible" mode="add" @submit-agent="addAgent" />
+      <h2>Список индивидуальных клиентов</h2>
+      <v-btn color="#4CAF50" @click="isAddModalVisible = true">Добавить клиента</v-btn>
+      <ClientList :clients="clients" @delete-client="deleteClient" @update-client="updateClient"/>
+      <ClientModal v-model="isAddModalVisible" mode="add" @submit-client="addClient" />
       <div v-if="isError" class="error-message">
         Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.
       </div>
