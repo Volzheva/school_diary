@@ -39,8 +39,6 @@ class IntegrationTests(TestCase):
         self.client = Client()
 
     def test_student_can_create_submission(self):
-        """Тест: Студент может создать сабмишен для домашней работы.
-        Проверяет интеграцию между представлением, моделью Submission и проверкой прав."""
         self.client.login(username='student1', password='studentpass123')
 
         url = reverse('create_submission_', kwargs={'pk': self.homework.pk})
@@ -56,8 +54,6 @@ class IntegrationTests(TestCase):
         self.assertIsNone(submission.grade)  # Оценка должна быть пустой
 
     def test_teacher_can_grade_submission(self):
-        """Тест: Учитель может выставить оценку за сабмишен.
-        Проверяет интеграцию между представлением, моделью и проверкой роли."""
         submission = Submission.objects.create(
             homework=self.homework,
             student=self.student,
@@ -75,8 +71,6 @@ class IntegrationTests(TestCase):
         self.assertEqual(submission.grade, 5)
 
     def test_teacher_sees_ungraded_submissions(self):
-        """Тест: Учитель видит список неоценнённых сабмишенов.
-        Проверяет интеграцию сложного запроса к БД и формирования контекста для шаблона."""
         Submission.objects.create(
             homework=self.homework,
             student=self.student,
@@ -102,8 +96,6 @@ class IntegrationTests(TestCase):
         self.assertEqual(ungraded_submissions[0].submitted_text, "Ungraded work")
 
     def test_student_cannot_grade_submission(self):
-        """Тест: Студент не может выставить оценку (проверка прав доступа).
-        Проверяет корректную работу системы авторизации на уровне представления."""
         submission = Submission.objects.create(
             homework=self.homework,
             student=self.student,
@@ -122,8 +114,6 @@ class IntegrationTests(TestCase):
         self.assertIsNone(submission.grade)
 
     def test_grades_by_subject_per_class_structure(self):
-        """Тест: Правильная структура данных для страницы оценок по предметам и классам.
-        Проверяет корректность агрегации данных из нескольких связанных моделей."""
         Submission.objects.create(
             homework=self.homework,
             student=self.student,
